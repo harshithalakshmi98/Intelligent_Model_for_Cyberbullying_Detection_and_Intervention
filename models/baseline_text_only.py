@@ -1,6 +1,2 @@
-"""
-Text-only baseline (TF-IDF + XGBoost). Option C in implementation guide.
-Used as A1 in ablation studies.
-"""
-# Placeholder: implement TF-IDF vectorisation + XGBoost classifier
-# No peerness or repetition features
+"""Backward-compat shim — canonical code: src/phase1_training/models/baseline_text_only.py"""
+from src.phase1_training.models.baseline_text_only import *  # noqa: F401,F403

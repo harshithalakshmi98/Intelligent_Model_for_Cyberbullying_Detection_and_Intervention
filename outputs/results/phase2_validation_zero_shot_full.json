@@ -1,0 +1,198 @@
+{
+  "twitter_parsed_dataset.csv": {
+    "accuracy": 0.6826329534662868,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "confusion_matrix": [
+      [
+        11501,
+        0
+      ],
+      [
+        5347,
+        0
+      ]
+    ],
+    "support": {
+      "n_samples": 16848,
+      "n_positive": 5347,
+      "n_negative": 11501
+    },
+    "roc_auc": 0.5112276931481243,
+    "classification_report": {
+      "0": {
+        "precision": 0.6826329534662868,
+        "recall": 1.0,
+        "f1-score": 0.8113866450315708,
+        "support": 11501.0
+      },
+      "1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 5347.0
+      },
+      "accuracy": 0.6826329534662868,
+      "macro avg": {
+        "precision": 0.3413164767331434,
+        "recall": 0.5,
+        "f1-score": 0.4056933225157854,
+        "support": 16848.0
+      },
+      "weighted avg": {
+        "precision": 0.4659877491581057,
+        "recall": 0.6826329534662868,
+        "f1-score": 0.5538792619010028,
+        "support": 16848.0
+      }
+    }
+  },
+  "twitter_racism_parsed_dataset.csv": {
+    "accuracy": 0.8537599287358029,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "confusion_matrix": [
+      [
+        11501,
+        0
+      ],
+      [
+        1970,
+        0
+      ]
+    ],
+    "support": {
+      "n_samples": 13471,
+      "n_positive": 1970,
+      "n_negative": 11501
+    },
+    "roc_auc": 0.44330982916073947,
+    "classification_report": {
+      "0": {
+        "precision": 0.8537599287358029,
+        "recall": 1.0,
+        "f1-score": 0.9211116450424476,
+        "support": 11501.0
+      },
+      "1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 1970.0
+      },
+      "accuracy": 0.8537599287358029,
+      "macro avg": {
+        "precision": 0.42687996436790143,
+        "recall": 0.5,
+        "f1-score": 0.4605558225212238,
+        "support": 13471.0
+      },
+      "weighted avg": {
+        "precision": 0.7289060159149632,
+        "recall": 0.8537599287358029,
+        "f1-score": 0.7864082124291581,
+        "support": 13471.0
+      }
+    }
+  },
+  "twitter_sexism_parsed_dataset.csv": {
+    "accuracy": 0.7730205672805485,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "confusion_matrix": [
+      [
+        11501,
+        0
+      ],
+      [
+        3377,
+        0
+      ]
+    ],
+    "support": {
+      "n_samples": 14878,
+      "n_positive": 3377,
+      "n_negative": 11501
+    },
+    "roc_auc": 0.5508481231318815,
+    "classification_report": {
+      "0": {
+        "precision": 0.7730205672805485,
+        "recall": 1.0,
+        "f1-score": 0.8719815004359528,
+        "support": 11501.0
+      },
+      "1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 3377.0
+      },
+      "accuracy": 0.7730205672805485,
+      "macro avg": {
+        "precision": 0.38651028364027423,
+        "recall": 0.5,
+        "f1-score": 0.4359907502179764,
+        "support": 14878.0
+      },
+      "weighted avg": {
+        "precision": 0.5975607974387409,
+        "recall": 0.7730205672805485,
+        "f1-score": 0.674059634125144,
+        "support": 14878.0
+      }
+    }
+  },
+  "youtube_parsed_dataset.csv": {
+    "accuracy": 0.8796189376443418,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "confusion_matrix": [
+      [
+        3047,
+        0
+      ],
+      [
+        417,
+        0
+      ]
+    ],
+    "support": {
+      "n_samples": 3464,
+      "n_positive": 417,
+      "n_negative": 3047
+    },
+    "roc_auc": 0.5983067828638304,
+    "classification_report": {
+      "0": {
+        "precision": 0.8796189376443418,
+        "recall": 1.0,
+        "f1-score": 0.9359545384733527,
+        "support": 3047.0
+      },
+      "1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 417.0
+      },
+      "accuracy": 0.8796189376443418,
+      "macro avg": {
+        "precision": 0.4398094688221709,
+        "recall": 0.5,
+        "f1-score": 0.4679772692366764,
+        "support": 3464.0
+      },
+      "weighted avg": {
+        "precision": 0.7737294754625605,
+        "recall": 0.8796189376443418,
+        "f1-score": 0.8232833368153307,
+        "support": 3464.0
+      }
+    }
+  }
+}

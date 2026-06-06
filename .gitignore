@@ -20,3 +20,6 @@ Thumbs.db
 # Large generated outputs (optional — uncomment if not versioning outputs)
 # outputs/reports/*.mp4
 # outputs/data/*.csv
+
+# Local pip install target (dev only)
+.venv_packages/

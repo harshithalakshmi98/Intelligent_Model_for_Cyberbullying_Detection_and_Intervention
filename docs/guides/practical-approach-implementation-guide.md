@@ -1,6 +1,9 @@
 # Practical Approach: Implementation Guide
 
 **Project:** Intelligent Model for Cyberbullying Detection and Intervention  
+
+> **Note:** This content is now consolidated in [`IMPLEMENTATION.md`](../../IMPLEMENTATION.md) (Part C — step-by-step guide). Use that file as the single master document. This file is kept as a reference copy.
+
 **Purpose:** Step-by-step guide for implementing the dissertation methodology
 
 **Research Question:** *What contribution do relational and behavioural features (peerness, repetition) make to cyberbullying detection compared with text-only approaches?*

@@ -1,5 +1,2 @@
-"""
-Evaluation metrics: accuracy, precision, recall, F1, ROC-AUC, confusion matrix.
-See practical-approach-implementation-guide.md Step 6.
-"""
-# Placeholder: sklearn.metrics or custom wrappers
+"""Backward-compat shim — canonical code: src/common/evaluation/metrics.py"""
+from src.common.evaluation.metrics import *  # noqa: F401,F403
