@@ -48,7 +48,7 @@ This shows that **Dataset 1 and the aggression/attack/toxicity files in Dataset 
 | `twitter_racism_parsed_dataset.csv` | Twitter | **No** – different platform |
 | `twitter_sexism_parsed_dataset.csv` | Twitter | **No** – different platform |
 | `youtube_parsed_dataset.csv` | YouTube | **No** – different platform |
-| `kaggle_parsed_dataset.csv` | Mixed | **Check** – may contain Wikipedia texts |
+| `kaggle_parsed_dataset.csv` | Wikipedia | **Yes** – same source, do not use |
 
 ---
 
@@ -69,8 +69,8 @@ These are effectively the same data as Dataset 1, so using them for validation w
 
 These come from Twitter/YouTube and are independent of the Wikipedia-based Dataset 1.
 
-### Before using Kaggle
-- Inspect `kaggle_parsed_dataset.csv` for Wikipedia-style text; if it matches, treat it like the other Wikipedia-based files and avoid it for validation.
+### Kaggle file — formally excluded
+Checked `kaggle_parsed_dataset.csv`: all 7,557 non-null timestamps use the `20120618192155Z` Wikipedia format, confirming it originates from the same Wikipedia Talk page corpus. There is no exact text overlap with the training data (different messages were sampled), but the statistical distribution is the same. Treat it the same as aggression/attack/toxicity — do not use for validation.
 
 ---
 

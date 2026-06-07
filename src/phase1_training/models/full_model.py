@@ -1,19 +1,24 @@
-"""
-Full model: text branch (TF-IDF) + tabular branch (peerness, repetition).
-Ablation A4. Combines sparse text vectors with scaled tabular features → XGBoost.
-"""
 import joblib
 import numpy as np
-from scipy.sparse import hstack, csr_matrix
+from scipy.sparse import csr_matrix, hstack
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 
-TABULAR_FEATURES = ["Peerness", "TotalMsgs", "AggressiveMsgs", "aggression_ratio"]
+# relational/behavioural columns for the full model (ablation A4)
+# includes derived features: is_repeat_offender (bool→int) and combined_score (Peerness × aggression_ratio)
+TABULAR_FEATURES = [
+    "Peerness",
+    "TotalMsgs",
+    "AggressiveMsgs",
+    "aggression_ratio",
+    "is_repeat_offender",
+    "combined_score",
+]
 
 
 class FullModel:
-    """Text + peerness + repetition ensemble via feature concatenation."""
+    """Text (TF-IDF) + tabular relational/behavioural features fed into XGBoost."""
 
     def __init__(
         self,
@@ -52,8 +57,8 @@ class FullModel:
         else:
             text_vec = self.tfidf.transform(X_text)
             tab_scaled = self.scaler.transform(X_tabular)
-        tab_sparse = csr_matrix(tab_scaled)
-        return hstack([text_vec, tab_sparse])
+        # concatenate sparse text vectors with scaled tabular columns
+        return hstack([text_vec, csr_matrix(tab_scaled)])
 
     def fit(self, X_text, X_tabular, y):
         X = self._build_matrix(X_text, X_tabular, fit=True)

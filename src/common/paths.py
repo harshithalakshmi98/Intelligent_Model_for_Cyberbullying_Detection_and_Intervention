@@ -1,4 +1,3 @@
-"""Shared project paths — resolves F21MP root from any src/ module."""
 from pathlib import Path
 
 

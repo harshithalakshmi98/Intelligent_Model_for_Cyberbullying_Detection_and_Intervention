@@ -1,10 +1,3 @@
-"""
-Phase 2 — Cross-dataset validation on Cyberbullying subsets (Twitter/YouTube).
-
-Supported strategies:
-- text_only: use Phase 1 A1 baseline model
-- zero_shot_full: use Phase 1 A4 model with default tabular values
-"""
 from pathlib import Path
 
 import numpy as np
@@ -36,16 +29,16 @@ def _prepare_subset(df):
     return out
 
 
-def _phase1_tabular_defaults():
-    """
-    Defaults for zero-shot full model when validation set has no tabular fields.
-    Chosen from training data medians / typical values.
-    """
+def _tabular_defaults():
+    # when validating the full model on external data, these stand in for missing relational features
+    # is_repeat_offender=0: no prior aggression known; combined_score=0: neutral (0.5 * 0.0)
     return {
         "Peerness": 0.5,
         "TotalMsgs": 1.0,
         "AggressiveMsgs": 0.0,
         "aggression_ratio": 0.0,
+        "is_repeat_offender": 0,
+        "combined_score": 0.0,
     }
 
 
@@ -60,29 +53,22 @@ def _evaluate_text_only(subsets, model_path, threshold=0.5):
     for name, raw_df in subsets.items():
         df = _prepare_subset(raw_df)
         y_true = df[LABEL_COL].values
-        X_text = df["text_clean"].tolist()
-        y_proba = model.predict_proba(X_text)
+        y_proba = model.predict_proba(df["text_clean"].tolist())
         results[name] = _metrics_at_threshold(y_true, y_proba, threshold)
     return results
 
 
 def _evaluate_zero_shot_full(subsets, model_path, threshold=0.5):
     model = FullModel.load(model_path)
-    defaults = _phase1_tabular_defaults()
+    defaults = _tabular_defaults()
     results = {}
     for name, raw_df in subsets.items():
         df = _prepare_subset(raw_df)
         y_true = df[LABEL_COL].values
-        X_text = df["text_clean"].tolist()
         X_tab = np.column_stack(
-            [
-                np.full(len(df), defaults["Peerness"], dtype=float),
-                np.full(len(df), defaults["TotalMsgs"], dtype=float),
-                np.full(len(df), defaults["AggressiveMsgs"], dtype=float),
-                np.full(len(df), defaults["aggression_ratio"], dtype=float),
-            ]
+            [np.full(len(df), v, dtype=float) for v in defaults.values()]
         )
-        y_proba = model.predict_proba(X_text, X_tab)
+        y_proba = model.predict_proba(df["text_clean"].tolist(), X_tab)
         results[name] = _metrics_at_threshold(y_true, y_proba, threshold)
     return results
 
@@ -106,15 +92,6 @@ def _summarise(results):
 
 
 def run_validation(model_path=None, strategy="text_only", threshold=0.5, save_outputs=True):
-    """
-    Run trained Phase 1 model on Cyberbullying validation subsets.
-
-    Args:
-        model_path: optional explicit model path
-        strategy: 'text_only' or 'zero_shot_full'
-        threshold: decision threshold applied on positive probability
-        save_outputs: save JSON + CSV summary under outputs/results/
-    """
     subsets = load_twitter_youtube_only()
     if not subsets:
         raise FileNotFoundError("No validation subsets found in datasets/cyberbullying/")
@@ -126,25 +103,19 @@ def run_validation(model_path=None, strategy="text_only", threshold=0.5, save_ou
         model_path = Path(model_path or (MODELS_DIR / "full_a4.joblib"))
         detailed = _evaluate_zero_shot_full(subsets, model_path, threshold=threshold)
     else:
-        raise ValueError("strategy must be one of: 'text_only', 'zero_shot_full'")
+        raise ValueError("strategy must be 'text_only' or 'zero_shot_full'")
 
     summary = _summarise(detailed)
 
     if save_outputs:
         RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-        json_path = RESULTS_DIR / f"phase2_validation_{strategy}.json"
-        csv_path = RESULTS_DIR / f"phase2_validation_{strategy}_summary.csv"
-        save_metrics(detailed, json_path)
-        summary.to_csv(csv_path, index=False)
+        save_metrics(detailed, RESULTS_DIR / f"phase2_validation_{strategy}.json")
+        summary.to_csv(RESULTS_DIR / f"phase2_validation_{strategy}_summary.csv", index=False)
 
     return {"strategy": strategy, "threshold": threshold, "details": detailed, "summary": summary}
 
 
 def sweep_thresholds(strategy="text_only", thresholds=None, save_outputs=True):
-    """
-    Run Phase 2 validation over multiple thresholds.
-    Returns one row per (subset, threshold).
-    """
     if thresholds is None:
         thresholds = np.arange(0.10, 0.91, 0.05)
 
@@ -187,12 +158,8 @@ def run_domain_adaptive_finetune(
     save_outputs=True,
 ):
     """
-    Small target-domain fine-tune experiment (text-only):
-      1) Split subset into adapt_train and held-out test
-      2) Split adapt_train into fit/calib
-      3) Train text-only model on fit
-      4) Choose threshold on calib (max F1)
-      5) Evaluate on held-out test
+    Light domain adaptation: train a text-only model on a small slice of target data,
+    pick decision threshold on a calibration split, evaluate on held-out test.
     """
     subsets = load_twitter_youtube_only()
     if subset_name not in subsets:
@@ -203,8 +170,7 @@ def run_domain_adaptive_finetune(
     y = df[LABEL_COL].astype(int).values
 
     X_adapt, X_test, y_adapt, y_test = train_test_split(
-        X,
-        y,
+        X, y,
         test_size=max(0.2, 1.0 - adapt_fraction),
         random_state=random_state,
         stratify=y,
@@ -251,9 +217,8 @@ def run_embedding_extension(
     save_outputs=True,
 ):
     """
-    Embedding-style extension (lightweight):
-      TF-IDF -> TruncatedSVD (dense semantic vectors) -> LogisticRegression.
-    Uses same adapt/calib/test protocol and threshold selection as fine-tune experiment.
+    TF-IDF -> TruncatedSVD dense vectors -> LogisticRegression.
+    Same adapt/calib/test protocol as the fine-tune experiment.
     """
     subsets = load_twitter_youtube_only()
     if subset_name not in subsets:
@@ -264,8 +229,7 @@ def run_embedding_extension(
     y = df[LABEL_COL].astype(int).values
 
     X_adapt, X_test, y_adapt, y_test = train_test_split(
-        X,
-        y,
+        X, y,
         test_size=max(0.2, 1.0 - adapt_fraction),
         random_state=random_state,
         stratify=y,
@@ -313,13 +277,8 @@ def _bootstrap_ci(values, n_boot=2000, alpha=0.05, random_state=42):
     vals = np.array(values, dtype=float)
     if len(vals) == 0:
         return np.nan, np.nan
-    boots = []
-    for _ in range(n_boot):
-        sample = rng.choice(vals, size=len(vals), replace=True)
-        boots.append(float(np.mean(sample)))
-    lo = float(np.quantile(boots, alpha / 2))
-    hi = float(np.quantile(boots, 1 - alpha / 2))
-    return lo, hi
+    boots = [float(np.mean(rng.choice(vals, size=len(vals), replace=True))) for _ in range(n_boot)]
+    return float(np.quantile(boots, alpha / 2)), float(np.quantile(boots, 1 - alpha / 2))
 
 
 def run_adaptation_robustness(
@@ -328,42 +287,29 @@ def run_adaptation_robustness(
     seeds=(13, 42, 77),
     save_outputs=True,
 ):
-    """
-    Robustness check over multiple random seeds for key adaptation experiments.
-    Returns per-seed scores + mean/std + 95% bootstrap CI for F1.
-    """
+    """Repeat both adaptation experiments over multiple seeds to check F1 stability."""
     rows = []
     for seed in seeds:
         ft = run_domain_adaptive_finetune(
-            subset_name=subset_name,
-            adapt_fraction=adapt_fraction,
-            random_state=int(seed),
-            save_outputs=False,
+            subset_name=subset_name, adapt_fraction=adapt_fraction,
+            random_state=int(seed), save_outputs=False,
         )
         emb = run_embedding_extension(
-            subset_name=subset_name,
-            adapt_fraction=adapt_fraction,
-            random_state=int(seed),
-            save_outputs=False,
+            subset_name=subset_name, adapt_fraction=adapt_fraction,
+            random_state=int(seed), save_outputs=False,
         )
-        rows.append(
-            {
-                "seed": int(seed),
-                "experiment": "domain_adaptive_finetune",
-                "f1": float(ft["test_metrics"]["f1"]),
-                "roc_auc": float(ft["test_metrics"]["roc_auc"]),
-                "threshold": float(ft["threshold_selected_on_calib"]),
-            }
-        )
-        rows.append(
-            {
-                "seed": int(seed),
-                "experiment": "embedding_extension",
-                "f1": float(emb["test_metrics"]["f1"]),
-                "roc_auc": float(emb["test_metrics"]["roc_auc"]),
-                "threshold": float(emb["threshold_selected_on_calib"]),
-            }
-        )
+        rows.append({
+            "seed": int(seed), "experiment": "domain_adaptive_finetune",
+            "f1": float(ft["test_metrics"]["f1"]),
+            "roc_auc": float(ft["test_metrics"]["roc_auc"]),
+            "threshold": float(ft["threshold_selected_on_calib"]),
+        })
+        rows.append({
+            "seed": int(seed), "experiment": "embedding_extension",
+            "f1": float(emb["test_metrics"]["f1"]),
+            "roc_auc": float(emb["test_metrics"]["roc_auc"]),
+            "threshold": float(emb["threshold_selected_on_calib"]),
+        })
 
     per_seed = pd.DataFrame(rows).sort_values(["experiment", "seed"]).reset_index(drop=True)
 
@@ -371,20 +317,18 @@ def run_adaptation_robustness(
     for exp, grp in per_seed.groupby("experiment"):
         f1_vals = grp["f1"].values
         ci_lo, ci_hi = _bootstrap_ci(f1_vals)
-        summary_rows.append(
-            {
-                "experiment": exp,
-                "runs": int(len(grp)),
-                "f1_mean": float(np.mean(f1_vals)),
-                "f1_std": float(np.std(f1_vals, ddof=1)) if len(f1_vals) > 1 else 0.0,
-                "f1_min": float(np.min(f1_vals)),
-                "f1_max": float(np.max(f1_vals)),
-                "f1_ci95_low": ci_lo,
-                "f1_ci95_high": ci_hi,
-                "roc_auc_mean": float(np.mean(grp["roc_auc"].values)),
-                "threshold_mean": float(np.mean(grp["threshold"].values)),
-            }
-        )
+        summary_rows.append({
+            "experiment": exp,
+            "runs": int(len(grp)),
+            "f1_mean": float(np.mean(f1_vals)),
+            "f1_std": float(np.std(f1_vals, ddof=1)) if len(f1_vals) > 1 else 0.0,
+            "f1_min": float(np.min(f1_vals)),
+            "f1_max": float(np.max(f1_vals)),
+            "f1_ci95_low": ci_lo,
+            "f1_ci95_high": ci_hi,
+            "roc_auc_mean": float(np.mean(grp["roc_auc"].values)),
+            "threshold_mean": float(np.mean(grp["threshold"].values)),
+        })
     summary = pd.DataFrame(summary_rows).sort_values("experiment").reset_index(drop=True)
 
     if save_outputs:
@@ -403,10 +347,7 @@ def run_misclassification_analysis(
     top_n=20,
     save_outputs=True,
 ):
-    """
-    Save a compact error-analysis table with misclassified examples.
-    experiment: 'embedding_extension' or 'domain_adaptive_finetune'
-    """
+    """Pull out the highest-confidence wrong predictions to inspect failure modes."""
     subsets = load_twitter_youtube_only()
     if subset_name not in subsets:
         raise ValueError(f"Subset not found: {subset_name}")
@@ -417,9 +358,7 @@ def run_misclassification_analysis(
     raw_text = df[TEXT_COL].fillna("").astype(str).values
 
     X_adapt, X_test, y_adapt, y_test, txt_adapt, txt_test = train_test_split(
-        X,
-        y,
-        raw_text,
+        X, y, raw_text,
         test_size=max(0.2, 1.0 - adapt_fraction),
         random_state=random_state,
         stratify=y,
@@ -455,20 +394,8 @@ def run_misclassification_analysis(
 
     y_pred = (test_proba >= threshold).astype(int)
     mask = y_pred != y_test
-    err = pd.DataFrame(
-        {
-            "text": txt_test,
-            "y_true": y_test,
-            "y_pred": y_pred,
-            "y_proba": test_proba,
-        }
-    )[mask].copy()
-
-    err["error_type"] = np.where(
-        (err["y_true"] == 1) & (err["y_pred"] == 0),
-        "FN",
-        "FP",
-    )
+    err = pd.DataFrame({"text": txt_test, "y_true": y_test, "y_pred": y_pred, "y_proba": test_proba})[mask].copy()
+    err["error_type"] = np.where((err["y_true"] == 1) & (err["y_pred"] == 0), "FN", "FP")
     err["confidence_distance"] = np.abs(err["y_proba"] - threshold)
     err = err.sort_values("confidence_distance", ascending=False).head(int(top_n)).reset_index(drop=True)
 

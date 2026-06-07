@@ -1,8 +1,3 @@
-"""
-Text preprocessing for cyberbullying detection.
-Steps: lowercase, URL/mention removal, tokenise, optional stop words/lemmatise.
-See practical-approach-implementation-guide.md Step 3.
-"""
 import re
 
 
@@ -23,7 +18,7 @@ def remove_mentions(text):
 
 
 def preprocess(text, remove_stop_words=False):
-    """Basic pipeline: lowercase, strip URLs and @mentions."""
+    # strip URLs and @mentions before TF-IDF so they don't pollute vocabulary
     t = lowercase(text)
     t = remove_urls(t)
     t = remove_mentions(t)
@@ -32,5 +27,4 @@ def preprocess(text, remove_stop_words=False):
 
 
 def tokenize(text):
-    """Simple whitespace tokenisation after preprocessing."""
     return preprocess(text).split()

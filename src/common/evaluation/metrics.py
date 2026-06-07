@@ -1,7 +1,3 @@
-"""
-Evaluation metrics: accuracy, precision, recall, F1, ROC-AUC, confusion matrix.
-See IMPLEMENTATION.md Phase 1, Step 6.
-"""
 import json
 from pathlib import Path
 
@@ -18,7 +14,6 @@ from sklearn.metrics import (
 
 
 def compute_metrics(y_true, y_pred, y_proba=None):
-    """Return dict of classification metrics for binary labels."""
     y_true = np.asarray(y_true)
     y_pred = np.asarray(y_pred)
 
@@ -49,7 +44,6 @@ def compute_metrics(y_true, y_pred, y_proba=None):
 
 
 def save_metrics(metrics, path):
-    """Save metrics dict to JSON."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
@@ -58,7 +52,6 @@ def save_metrics(metrics, path):
 
 
 def print_metrics(metrics, title="Metrics"):
-    """Pretty-print key metrics."""
     print(f"\n=== {title} ===")
     print(f"Accuracy:  {metrics['accuracy']:.4f}")
     print(f"Precision: {metrics['precision']:.4f}")

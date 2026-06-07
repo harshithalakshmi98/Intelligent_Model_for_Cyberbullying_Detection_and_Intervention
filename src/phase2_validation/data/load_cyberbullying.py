@@ -1,13 +1,10 @@
-"""
-Phase 2 — Load Cyberbullying Dataset subsets for validation.
-Use only Twitter and YouTube (no aggression, attack, toxicity — overlap with training).
-"""
 import pandas as pd
 
 from src.common.paths import DATASETS_DIR
 
 CYBER_DIR = DATASETS_DIR / "cyberbullying"
 
+# aggression/attack/toxicity files overlap with training corpus — do not use for validation
 VALIDATION_FILES = [
     "twitter_parsed_dataset.csv",
     "twitter_racism_parsed_dataset.csv",
@@ -17,7 +14,6 @@ VALIDATION_FILES = [
 
 
 def load_validation_subset(name):
-    """Load one validation subset by filename."""
     path = CYBER_DIR / name
     if not path.exists():
         raise FileNotFoundError(f"Expected: {path}")
@@ -25,7 +21,6 @@ def load_validation_subset(name):
 
 
 def load_twitter_youtube_only():
-    """Load Twitter and YouTube subsets only."""
     out = {}
     for f in VALIDATION_FILES:
         try:
@@ -36,7 +31,7 @@ def load_twitter_youtube_only():
 
 
 def harmonise_labels(df, label_col="oh_label"):
-    """Map validation labels to binary 0/1 (same as CBLabel)."""
+    """Map validation labels to binary 0/1 to match CBLabel convention."""
     out = df.copy()
     if label_col in out.columns:
         out["label_binary"] = out[label_col].astype(int)

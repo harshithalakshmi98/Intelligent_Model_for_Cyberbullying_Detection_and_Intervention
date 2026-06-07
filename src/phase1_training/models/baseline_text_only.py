@@ -1,7 +1,3 @@
-"""
-Text-only baseline (TF-IDF + XGBoost). Ablation A1.
-No peerness or repetition features.
-"""
 import joblib
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -24,7 +20,7 @@ def _make_xgb(scale_pos_weight=1.0, random_state=42):
 
 
 class TextOnlyModel:
-    """TF-IDF text features + XGBoost binary classifier."""
+    """TF-IDF + XGBoost classifier using message text only (ablation A1)."""
 
     def __init__(self, max_features=10000, scale_pos_weight=1.0, random_state=42):
         self.max_features = max_features

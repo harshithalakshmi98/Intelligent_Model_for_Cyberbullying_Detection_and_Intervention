@@ -1,7 +1,3 @@
-"""
-Phase 1 — Training pipeline: baseline (A1) and full model (A4).
-Stratified split by (User1, User2) — no pair in both train and test.
-"""
 from pathlib import Path
 
 import matplotlib
@@ -24,7 +20,6 @@ PAIR_COLS = ["User1", "User2"]
 
 
 def prepare_dataframe(df=None):
-    """Load, merge, engineer features, and preprocess text."""
     df = df if df is not None else load_and_merge()
     df = add_derived_features(df)
     df[TEXT_COL] = df["Message"].apply(preprocess)
@@ -34,7 +29,7 @@ def prepare_dataframe(df=None):
 
 
 def split_by_user_pair(df, test_size=0.2, random_state=42):
-    """Split by user pair with stratification on pair-level max CBLabel."""
+    """Split so no (User1, User2) pair appears in both train and test sets."""
     pair_labels = (
         df.groupby(PAIR_COLS, as_index=False)[TARGET_COL]
         .max()
@@ -82,7 +77,6 @@ def _plot_confusion_matrix(cm, title, path):
 
 
 def train_phase1(test_size=0.2, random_state=42, save_outputs=True, verbose=True):
-    """Train baseline (A1) and full model (A4); return models and metrics."""
     df = prepare_dataframe()
     train_df, test_df = split_by_user_pair(df, test_size=test_size, random_state=random_state)
 
@@ -103,12 +97,14 @@ def train_phase1(test_size=0.2, random_state=42, save_outputs=True, verbose=True
         print(f"Train CBLabel counts:\n{train_df[TARGET_COL].value_counts()}")
         print(f"scale_pos_weight: {pos_weight:.2f}")
 
+    # train A1 baseline (text only)
     baseline = build_baseline(scale_pos_weight=pos_weight, random_state=random_state)
     baseline.fit(X_train_text, y_train)
     baseline_pred = baseline.predict(X_test_text)
     baseline_proba = baseline.predict_proba(X_test_text)
     baseline_metrics = compute_metrics(y_test, baseline_pred, baseline_proba)
 
+    # train A4 full model (text + peerness + repetition)
     full = build_full_model(scale_pos_weight=pos_weight, random_state=random_state)
     full.fit(X_train_text, X_train_tab, y_train)
     full_pred = full.predict(X_test_text, X_test_tab)

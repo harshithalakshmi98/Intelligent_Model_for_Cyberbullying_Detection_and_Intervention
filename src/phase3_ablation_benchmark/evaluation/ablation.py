@@ -1,6 +1,3 @@
-"""
-Phase 3 — Ablation studies (A1–A4) and Automated Hate Speech benchmark.
-"""
 from pathlib import Path
 
 import matplotlib
@@ -58,7 +55,7 @@ def _plot_ablation_f1(df, path):
 
 
 def run_ablation(test_size=0.2, random_state=42, save_outputs=True):
-    """Run A1 (text), A2 (+peerness), A3 (+repetition), A4 (full)."""
+    """Run A1–A4 on the same train/test split to measure each feature group's contribution."""
     df = prepare_dataframe()
     train_df, test_df = split_by_user_pair(df, test_size=test_size, random_state=random_state)
 
@@ -78,66 +75,59 @@ def run_ablation(test_size=0.2, random_state=42, save_outputs=True):
     # A2: text + peerness
     a2_cols = ["Peerness"]
     a2_model = FullModel(tabular_cols=a2_cols, scale_pos_weight=pos_weight, random_state=random_state)
-    results.append(
-        _evaluate_variant(
-            "A2_text_plus_peerness",
-            a2_model,
-            X_train_text,
-            X_test_text,
-            y_train,
-            y_test,
-            X_train_tab=train_df[a2_cols].values,
-            X_test_tab=test_df[a2_cols].values,
-        )
-    )
+    results.append(_evaluate_variant(
+        "A2_text_plus_peerness", a2_model,
+        X_train_text, X_test_text, y_train, y_test,
+        X_train_tab=train_df[a2_cols].values,
+        X_test_tab=test_df[a2_cols].values,
+    ))
 
-    # A3: text + repetition
-    a3_cols = ["TotalMsgs", "AggressiveMsgs", "aggression_ratio"]
+    # A3: text + repetition features (including the discrete repeat-offender flag)
+    a3_cols = ["TotalMsgs", "AggressiveMsgs", "aggression_ratio", "is_repeat_offender"]
     a3_model = FullModel(tabular_cols=a3_cols, scale_pos_weight=pos_weight, random_state=random_state)
-    results.append(
-        _evaluate_variant(
-            "A3_text_plus_repetition",
-            a3_model,
-            X_train_text,
-            X_test_text,
-            y_train,
-            y_test,
-            X_train_tab=train_df[a3_cols].values,
-            X_test_tab=test_df[a3_cols].values,
-        )
-    )
+    results.append(_evaluate_variant(
+        "A3_text_plus_repetition", a3_model,
+        X_train_text, X_test_text, y_train, y_test,
+        X_train_tab=train_df[a3_cols].values,
+        X_test_tab=test_df[a3_cols].values,
+    ))
 
-    # A4: text + peerness + repetition
+    # A4: text + peerness + repetition (full model, includes derived interaction features)
     a4_cols = TABULAR_FEATURES
     a4_model = FullModel(tabular_cols=a4_cols, scale_pos_weight=pos_weight, random_state=random_state)
-    results.append(
-        _evaluate_variant(
-            "A4_full",
-            a4_model,
-            X_train_text,
-            X_test_text,
-            y_train,
-            y_test,
-            X_train_tab=train_df[a4_cols].values,
-            X_test_tab=test_df[a4_cols].values,
-        )
-    )
+    results.append(_evaluate_variant(
+        "A4_full", a4_model,
+        X_train_text, X_test_text, y_train, y_test,
+        X_train_tab=train_df[a4_cols].values,
+        X_test_tab=test_df[a4_cols].values,
+    ))
+
+    # A5: text + peerness + repetition + user demographics (age, gender, age_diff)
+    # shows whether knowing who the users are (beyond their interaction history) adds further signal
+    a5_cols = TABULAR_FEATURES + ["age_user1", "age_user2", "age_diff", "gender_user1", "gender_user2"]
+    a5_available = all(c in train_df.columns for c in a5_cols)
+    if a5_available:
+        a5_model = FullModel(tabular_cols=a5_cols, scale_pos_weight=pos_weight, random_state=random_state)
+        results.append(_evaluate_variant(
+            "A5_full_plus_demographics", a5_model,
+            X_train_text, X_test_text, y_train, y_test,
+            X_train_tab=train_df[a5_cols].fillna(train_df[a5_cols].median()).values,
+            X_test_tab=test_df[a5_cols].fillna(train_df[a5_cols].median()).values,
+        ))
 
     summary_rows = []
     details = {}
     for r in results:
         m = r["metrics"]
         details[r["name"]] = m
-        summary_rows.append(
-            {
-                "experiment": r["name"],
-                "accuracy": m["accuracy"],
-                "precision": m["precision"],
-                "recall": m["recall"],
-                "f1": m["f1"],
-                "roc_auc": m.get("roc_auc"),
-            }
-        )
+        summary_rows.append({
+            "experiment": r["name"],
+            "accuracy": m["accuracy"],
+            "precision": m["precision"],
+            "recall": m["recall"],
+            "f1": m["f1"],
+            "roc_auc": m.get("roc_auc"),
+        })
 
     summary = pd.DataFrame(summary_rows)
 
@@ -151,7 +141,7 @@ def run_ablation(test_size=0.2, random_state=42, save_outputs=True):
 
 
 def run_hate_speech_benchmark(test_size=0.2, random_state=42, save_outputs=True):
-    """3-class benchmark on Automated Hate Speech dataset with two text-only baselines."""
+    """3-class benchmark on the Automated Hate Speech dataset — LR vs XGBoost."""
     df = load_labeled_data()
     if "tweet" not in df.columns or "class" not in df.columns:
         raise ValueError("Expected columns 'tweet' and 'class' in hate-speech dataset")
@@ -163,17 +153,14 @@ def run_hate_speech_benchmark(test_size=0.2, random_state=42, save_outputs=True)
         X, y, test_size=test_size, random_state=random_state, stratify=y
     )
 
-    # Shared TF-IDF features
     tfidf = TfidfVectorizer(max_features=20000, ngram_range=(1, 2), min_df=2, sublinear_tf=True)
     X_train_t = tfidf.fit_transform(X_train)
     X_test_t = tfidf.transform(X_test)
 
-    # Baseline 1: Logistic Regression
     lr = LogisticRegression(max_iter=200, n_jobs=1)
     lr.fit(X_train_t, y_train)
     lr_pred = lr.predict(X_test_t)
 
-    # Baseline 2: XGBoost multi-class
     xgb = XGBClassifier(
         objective="multi:softprob",
         num_class=3,
@@ -204,12 +191,10 @@ def run_hate_speech_benchmark(test_size=0.2, random_state=42, save_outputs=True)
         "tfidf_xgboost": multi_metrics(y_test, xgb_pred),
     }
 
-    summary = pd.DataFrame(
-        [
-            {"model": "tfidf_logreg", **out["tfidf_logreg"]},
-            {"model": "tfidf_xgboost", **out["tfidf_xgboost"]},
-        ]
-    )
+    summary = pd.DataFrame([
+        {"model": "tfidf_logreg", **out["tfidf_logreg"]},
+        {"model": "tfidf_xgboost", **out["tfidf_xgboost"]},
+    ])
 
     if save_outputs:
         RESULTS_DIR.mkdir(parents=True, exist_ok=True)

@@ -19,7 +19,7 @@
       "n_positive": 5347,
       "n_negative": 11501
     },
-    "roc_auc": 0.5112276931481243,
+    "roc_auc": 0.49397250354158057,
     "classification_report": {
       "0": {
         "precision": 0.6826329534662868,
@@ -68,7 +68,7 @@
       "n_positive": 1970,
       "n_negative": 11501
     },
-    "roc_auc": 0.44330982916073947,
+    "roc_auc": 0.40617116940173376,
     "classification_report": {
       "0": {
         "precision": 0.8537599287358029,
@@ -117,7 +117,7 @@
       "n_positive": 3377,
       "n_negative": 11501
     },
-    "roc_auc": 0.5508481231318815,
+    "roc_auc": 0.5451921151067267,
     "classification_report": {
       "0": {
         "precision": 0.7730205672805485,
@@ -166,7 +166,7 @@
       "n_positive": 417,
       "n_negative": 3047
     },
-    "roc_auc": 0.5983067828638304,
+    "roc_auc": 0.5991430026310425,
     "classification_report": {
       "0": {
         "precision": 0.8796189376443418,

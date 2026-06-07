@@ -68,7 +68,7 @@
       "n_positive": 25,
       "n_negative": 2445
     },
-    "roc_auc": 0.9999836400817995,
+    "roc_auc": 0.9999836400817996,
     "classification_report": {
       "0": {
         "precision": 1.0,
