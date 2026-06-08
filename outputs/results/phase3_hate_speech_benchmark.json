@@ -1,10 +1,10 @@
 {
   "tfidf_logreg": {
-    "accuracy": 0.8926770223925762,
-    "macro_precision": 0.8070380906896019,
-    "macro_recall": 0.6274238072115118,
-    "macro_f1": 0.656369507175785,
-    "weighted_f1": 0.8748764438578879,
+    "accuracy": 0.8835989509784143,
+    "macro_precision": 0.7161331814339208,
+    "macro_recall": 0.7710991085888727,
+    "macro_f1": 0.7403233545197446,
+    "weighted_f1": 0.8880530785793304,
     "n_samples": 4957
   },
   "tfidf_xgboost": {

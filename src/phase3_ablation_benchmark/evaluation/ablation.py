@@ -157,7 +157,8 @@ def run_hate_speech_benchmark(test_size=0.2, random_state=42, save_outputs=True)
     X_train_t = tfidf.fit_transform(X_train)
     X_test_t = tfidf.transform(X_test)
 
-    lr = LogisticRegression(max_iter=200, n_jobs=1)
+    # class_weight='balanced' compensates for the minority hate-speech class
+    lr = LogisticRegression(max_iter=400, class_weight="balanced", C=5.0, n_jobs=1)
     lr.fit(X_train_t, y_train)
     lr_pred = lr.predict(X_test_t)
 
