@@ -1,25 +1,58 @@
-# Python
+# --- Python ---
 __pycache__/
 *.py[cod]
+*$py.class
 *.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Virtual environments ---
 .venv/
 venv/
+env/
+.env/
+.venv_packages/
+
+# --- Environment / secrets ---
 .env
+.env.*
+!.env.example
+*.pem
+credentials*.json
 
-# Jupyter
+# --- Jupyter ---
 .ipynb_checkpoints/
+*/.ipynb_checkpoints/
 
-# OS
+# --- OS ---
 .DS_Store
 Thumbs.db
+Desktop.ini
 
-# IDE
+# --- IDE ---
 .idea/
 .vscode/
+*.swp
+*.swo
+*~
 
-# Large generated outputs (optional — uncomment if not versioning outputs)
+# --- Frontend runtime ---
+frontend/data/
+frontend/**/*.db
+
+# --- Build intermediates (regenerate via scripts/) ---
+outputs/reports/*.html
+*.log
+
+# --- Optional large / local-only artefacts ---
+# Uncomment if you prefer not to version these:
 # outputs/reports/*.mp4
 # outputs/data/*.csv
-
-# Local pip install target (dev only)
-.venv_packages/
+# outputs/models/*.joblib

@@ -7,6 +7,18 @@ No model logic, hyperparameters, or evaluation methodology was changed — all r
 
 ## Folder structure changes
 
+### July 2026 — GitHub-ready cleanup
+
+- Removed empty legacy root stubs again (`data/`, `models/`, `features/`, `evaluation/` — `__pycache__` only).
+- Moved `MP/` Canvas guidance screenshots into `docs/reference-materials/hwu-guidance/` (normalized filenames).
+- Moved sample past dissertations into `docs/reference-materials/examples/`.
+- Moved Word dissertation template into `docs/reference-materials/`.
+- Moved `outputs/planning/*.md` → `docs/planning/`.
+- Removed root duplicate `MScProjectJournalTemplate.docx` (canonical copy remains under `docs/reference-materials/`).
+- Renamed `outputs/reports/F21RP_Project_ Plan.mp4` → `F21RP_Project_Plan.mp4`.
+- Expanded root `.gitignore` (venv, caches, frontend SQLite, generated HTML).
+- Rewrote root `README.md`, `docs/README.md`, and `outputs/README.md` to match the layout.
+
 ### Deleted: root-level shim folders (`data/`, `features/`, `models/`, `evaluation/`)
 
 These four folders contained only one-liner re-export files like:
@@ -168,6 +180,6 @@ All 7,557 non-null timestamps use Wikipedia-format (`Z` suffix). Confirmed same 
 - **docs/research/ResearchReport.md** — untouched
 - **docs/guides/** — untouched
 - **docs/reports/FINAL_README_PHASE1_3.md** — untouched
-- **outputs/planning/**, **outputs/reports/** — untouched
+- **outputs/reports/** — submission deliverables (planning notes now in `docs/planning/`)
 - **requirements.txt** — untouched
-- **MP/** folder — untouched
+- **docs/reference-materials/** — includes former `MP/` guidance and example PDFs

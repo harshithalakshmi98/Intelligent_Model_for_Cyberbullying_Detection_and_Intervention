@@ -40,17 +40,30 @@ def _evaluate_variant(name, model, X_train_text, X_test_text, y_train, y_test, X
 
 
 def _plot_ablation_f1(df, path):
-    fig, ax = plt.subplots(figsize=(8, 4.5))
-    ax.bar(df["experiment"], df["f1"], color=["#1f77b4", "#2ca02c", "#ff7f0e", "#9467bd"])
+    label_map = {
+        "A1_text_only": "A1\n(text only)",
+        "A2_text_plus_peerness": "A2\n(+ peerness)",
+        "A3_text_plus_repetition": "A3\n(+ repetition)",
+        "A4_full": "A4\n(full)",
+        "A5_full_plus_demographics": "A5\n(+ demographics)",
+    }
+    labels = [label_map.get(name, name) for name in df["experiment"]]
+    colors = ["#1f77b4", "#2ca02c", "#ff7f0e", "#9467bd", "#17becf"][: len(df)]
+
+    fig, ax = plt.subplots(figsize=(9, 5))
+    x = np.arange(len(df))
+    ax.bar(x, df["f1"], color=colors, width=0.65)
     ax.set_title("Phase 3 Ablation (Towards Comprehensive)")
     ax.set_ylabel("F1")
     ax.set_xlabel("Experiment")
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels, fontsize=9)
     for i, v in enumerate(df["f1"]):
-        ax.text(i, v + 0.01, f"{v:.3f}", ha="center", fontsize=9)
-    ax.set_ylim(0, min(1.05, max(df["f1"]) + 0.12))
+        ax.text(i, v + 0.02, f"{v:.3f}", ha="center", fontsize=9)
+    ax.set_ylim(0, min(1.08, max(df["f1"]) + 0.14))
     fig.tight_layout()
     path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(path, dpi=180)
+    fig.savefig(path, dpi=180, bbox_inches="tight")
     plt.close(fig)
 
 

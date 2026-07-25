@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cyberbullying Moderator Dashboard</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div>
+      <h1>Cyberbullying Moderator Dashboard</h1>
+      <p class="subtitle">Human-in-the-loop review — research prototype (A1 / A4)</p>
+    </div>
+    <span id="health-badge" class="badge badge-muted">Checking…</span>
+  </header>
+
+  <aside class="disclaimer" role="note">
+    <strong>Disclaimer:</strong> Suggestions only — a human moderator must approve, dismiss, or escalate.
+    Do not use for live enforcement. Model trained on Towards Comprehensive; limited cross-platform generalisation.
+  </aside>
+
+  <main class="layout">
+    <section class="panel">
+      <h2>Analyse message</h2>
+      <form id="predict-form">
+        <label for="message">Message text</label>
+        <textarea id="message" rows="5" required placeholder="Enter message to classify…"></textarea>
+
+        <fieldset class="relational">
+          <legend>Relational metadata (optional — enables model A4)</legend>
+          <label class="checkbox">
+            <input type="checkbox" id="use-relational" checked />
+            Include peerness &amp; repetition fields
+          </label>
+          <div class="grid" id="relational-fields">
+            <label>Peerness (0–1)
+              <input type="number" id="peerness" min="0" max="1" step="0.01" value="0.58" />
+            </label>
+            <label>Total messages (pair)
+              <input type="number" id="total_msgs" min="1" value="4" />
+            </label>
+            <label>Aggressive messages (pair)
+              <input type="number" id="aggressive_msgs" min="0" value="2" />
+            </label>
+          </div>
+        </fieldset>
+
+        <label class="checkbox">
+          <input type="checkbox" id="prefer-full" checked />
+          Prefer full model (A4) when relational data provided
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" id="add-queue" checked />
+          Add flagged cases to review queue
+        </label>
+
+        <button type="submit" class="btn primary">Run detection</button>
+      </form>
+
+      <div id="result" class="result hidden"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Review queue</h2>
+        <button type="button" id="refresh-queue" class="btn secondary">Refresh</button>
+      </div>
+      <div id="queue-empty" class="muted">No pending cases.</div>
+      <ul id="queue-list" class="queue-list"></ul>
+    </section>
+  </main>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

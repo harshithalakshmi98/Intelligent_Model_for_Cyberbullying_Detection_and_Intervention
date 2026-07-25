@@ -1,29 +1,35 @@
-# Outputs
+# outputs/
 
-Generated artefacts from notebooks, training, and submissions. Do not treat this folder as source code.
-
-## Structure
+Generated artefacts from training, evaluation, figure scripts, and dissertation builds.  
+Source code lives in `src/`, `scripts/`, and `frontend/` — not here.
 
 ```
 outputs/
 ├── data/
-│   └── merged_towards_comprehensive.csv   # From EDA / load_and_merge()
-├── media/
-│   └── *.png                              # EDA screenshots, model diagrams
-├── planning/
-│   └── *.md                               # Project-planning slides and scripts
-└── reports/
+│   └── merged_towards_comprehensive.csv
+├── models/
+│   ├── baseline_a1.joblib
+│   └── full_a4.joblib
+├── results/                 # JSON/CSV metrics (all phases)
+├── media/                   # figures used by dissertation + slides
+└── reports/                 # submission-ready deliverables
+    ├── F21MP_Dissertation.pdf
+    ├── F21MP_Dissertation.docx
+    ├── F21MP_Dissertation.md          # export of research/Dissertation.md
+    ├── F21MP_Second_Marker_Interview.pptx
+    ├── F21MP_Project_Journal_Final.docx
     ├── F21RP_Research_Report.pdf
-    └── F21RP_Project_ Plan.mp4
+    └── F21RP_Project_Plan.mp4
 ```
 
-## Typical future contents
+## Rebuild notes
 
-- Trained model checkpoints (`outputs/models/` when added)
-- Ablation results tables (A1–A4)
-- Validation metrics per Cyberbullying subset
-- Confusion matrices, ROC curves, and benchmark tables
+- Dissertation PDF/MD: `scripts/build_dissertation_pdf.py`, `scripts/build_dissertation_md.py`
+- Interview PPT: `scripts/build_second_marker_presentation.py`
+- Figures: `scripts/generate_*.py`
 
-Merged data path used by `data/load_towards_comprehensive.py`:
+Intermediate HTML (`outputs/reports/*.html`) is gitignored — regenerate from Markdown when needed.
+
+Merged data path used by Phase 1 loaders:
 
 `outputs/data/merged_towards_comprehensive.csv`

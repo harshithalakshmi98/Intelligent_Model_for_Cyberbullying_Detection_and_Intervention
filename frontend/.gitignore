@@ -1,0 +1,5 @@
+# Runtime SQLite audit DB (created when the dashboard runs)
+data/
+*.db
+__pycache__/
+.DS_Store

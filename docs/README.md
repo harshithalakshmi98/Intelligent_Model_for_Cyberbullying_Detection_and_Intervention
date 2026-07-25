@@ -1,27 +1,44 @@
 # docs/
 
+Documentation, notes, and university reference materials.  
+**Dissertation source of truth:** `research/Dissertation.md`  
+**Submission PDFs / DOCX / PPTX:** `../outputs/reports/`
+
 ```
 docs/
 ├── research/
-│   └── ResearchReport.md                    # dissertation draft
+│   ├── Dissertation.md              # F21MP dissertation (edit here)
+│   └── ResearchReport.md            # F21RP research report draft
 │
 ├── guides/
-│   ├── dataset-overlap-analysis.md          # why aggression/attack/toxicity can't be used for validation
+│   ├── dataset-overlap-analysis.md
 │   ├── dissertation-key-factors-from-papers.md
 │   ├── additional-datasets-for-validation.md
 │   ├── practical-approach-implementation-guide.md
 │   └── practical-approach-simplified.md
 │
-├── notes/                                   # personal reference notes
-│   ├── results-all-phases.md                # ALL experimental results with exact numbers (use this for writing)
-│   ├── phase-reference.md                   # what each phase does, run commands, outputs, design decisions
-│   ├── implementation-checklist.md          # full task checklist with status (all phases)
-│   └── CHANGES.md                           # what was restructured and why
+├── notes/
+│   ├── results-all-phases.md
+│   ├── phase-reference.md
+│   ├── implementation-checklist.md
+│   ├── frontend-demo-script.md
+│   ├── second-marker-spoken-script.md
+│   ├── supervisor-meeting-script.md
+│   ├── supervisor-meeting-cheatsheet.md
+│   └── CHANGES.md
+│
+├── planning/                        # early F21RP/F21MP planning scripts
+│   ├── Project_Planning_5_Slides_Document.md
+│   ├── Project_Planning_5_Slides_Script.md
+│   └── Project_Planning_Rehearsal_One_Page.md
 │
 ├── reports/
-│   └── FINAL_README_PHASE1_3.md             # summary of what was achieved across all phases with key results
+│   └── FINAL_README_PHASE1_3.md
 │
-├── reference-materials/                     # HWU templates, journal examples, authorship declaration
+├── reference-materials/
+│   ├── *.pdf / *.docx               # HWU templates & guidance
+│   ├── hwu-guidance/                # Canvas format/length screenshots
+│   └── examples/                    # sample past dissertations (reference only)
 │
-└── IMPLEMENTATION.md                        # full implementation guide (phases, code snippets, design choices)
+└── IMPLEMENTATION.md
 ```
